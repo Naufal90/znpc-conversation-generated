@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZNPCs Conversation Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
+        textarea { width: 80%; height: 100px; margin: 10px 0; }
+        button { padding: 10px; margin: 5px; cursor: pointer; }
+        .output { white-space: pre-wrap; background: #f3f3f3; padding: 10px; border-radius: 5px; display: inline-block; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <h2>ZNPCs Conversation Generator</h2>
+
+    <label>Nama Percakapan:</label>
+    <input type="text" id="conversationName" placeholder="Misalnya: welcome_dialog"><br>
+
+    <label>Dialog NPC:</label>
+    <textarea id="npcDialog" placeholder="Halo! Kamu orang baru di sini?"></textarea><br>
+
+    <label>Opsi Jawaban (Pisahkan dengan | ):</label>
+    <input type="text" id="playerOptions" placeholder="Ya, saya baru di sini. | Tidak, saya sudah pernah di sini."><br>
+
+    <button onclick="generateCommands()">Buat Command</button>
+    <button onclick="copyToClipboard()">Copy</button>
+
+    <h3>Hasil Command:</h3>
+    <div class="output" id="output"></div>
+
+    <script>
+        function generateCommands() {
+            let name = document.getElementById("conversationName").value.trim();
+            let npcText = document.getElementById("npcDialog").value.trim();
+            let options = document.getElementById("playerOptions").value.trim().split("|");
+
+            if (!name || !npcText || options.length === 0) {
+                alert("Isi semua kolom!");
+                return;
+            }
+
+            let commands = `/znpcs conversation create ${name}\n`;
+            commands += `/znpcs conversation gui\n\n`;
+            commands += `NPC: "${npcText}"\n`;
+
+            options.forEach((opt, index) => {
+                let optName = name + "_opt" + (index + 1);
+                commands += `/znpcs action ${name} add text ${opt.trim()} | ${optName}\n`;
+            });
+
+            document.getElementById("output").innerText = commands;
+        }
+
+        function copyToClipboard() {
+            let text = document.getElementById("output").innerText;
+            navigator.clipboard.writeText(text).then(() => alert("Command copied!"));
+        }
+    </script>
+
+</body>
+      </html>
